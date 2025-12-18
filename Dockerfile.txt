@@ -1,0 +1,19 @@
+FROM archlinux:latest
+
+# 1. Install openssh along with other basics
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm base-devel git sudo bash openssh
+
+# 2. Create the user
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd -g $USER_GID $USERNAME && \
+    useradd -m -u $USER_UID -g $USER_GID -s /bin/bash $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# 3. Generate SSH host keys (Crucial for Arch)
+RUN ssh-keygen -A
+
+USER $USERNAME
